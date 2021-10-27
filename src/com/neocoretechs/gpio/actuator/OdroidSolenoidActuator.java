@@ -80,7 +80,7 @@ public class OdroidSolenoidActuator {
         // provision gpio pin as an output pin and turn on
         GpioPinDigitalOutput output[] = new GpioPinDigitalOutput[6];
         for(int i = 0; i < output.length; i++) {
-        	output[i] = gpio.provisionDigitalOutputPin(pins[i], ("Output"+i), PinState.HIGH);
+        	output[i] = gpio.provisionDigitalOutputPin(pins[i], ("Output"+i), PinState.LOW);
         	// set shutdown state for this pin: keep as output pin, set to low state
         	output[i].setShutdownOptions(false, PinState.LOW);
         }
@@ -131,6 +131,11 @@ public class OdroidSolenoidActuator {
     		// do it forever until we break and restart normally
     		for(;;) {
     			for(int i = 0; i < output.length; i++) {
+    		      	for(int j=0; j < 4; j++) {
+    	        		output[i].high(); // fire it off
+    	        		Thread.sleep(250);
+    	        		output[i].low();
+    	        	}
     				output[i].high();
     				Thread.sleep(2000); // pull it for 2 seconds
     				output[i].low();
@@ -171,7 +176,13 @@ public class OdroidSolenoidActuator {
             	gpio.shutdown();
         		System.exit(0); // we are all done, no more food to drop
         	}
-        	output[actuator].high(); // fire it off
+        	// vibrate it
+        	for(int j=0; j < 4; j++) {
+        		output[actuator].high(); // fire it off
+        		Thread.sleep(250);
+        		output[actuator].low();
+        	}
+    		output[actuator].high(); // fire it off
         	Thread.sleep(2000); // hold it for 2 seconds
         	output[actuator].low();
         	// write the actuator we just fired, in case we fail while waiting and restart
